@@ -18,7 +18,6 @@ except Exception as e:
 
 # Chemins des fichiers de configuration
 MESURES_PATH = '/home/pi/Station_meteo/Mesures_temperatures/mesure.txt'
-CALIBRATION_PATH = '/home/pi/Station_meteo/Mesures_temperatures/calibration_history.csv'
 
 app = Flask(__name__)
 
@@ -39,7 +38,7 @@ def lire_fichier(chemin):
         print(f"Erreur lors de la lecture du fichier {chemin}: {e}")
         return None
 
-def mesure_capteur_brut():
+def mesure_capteur():
     if ads is None:
         return -255
 
@@ -56,94 +55,30 @@ def mesure_capteur_brut():
     return track_temperature
 
 
-def get_latest_offset():
-    try:
-        with open(CALIBRATION_PATH, 'r') as fichier:
-            lignes = [ligne.strip() for ligne in fichier if ligne.strip()]
-    except FileNotFoundError:
-        return 0.0
-    except Exception as e:
-        print(f"Erreur lecture calibration: {e}")
-        return 0.0
-
-    if len(lignes) <= 1:
-        return 0.0
-
-    try:
-        derniere = lignes[-1].split(',')
-        return float(derniere[3])
-    except Exception:
-        return 0.0
-
-
-def mesure_capteur():
-    valeur_brute = mesure_capteur_brut()
-    if valeur_brute == -255:
-        return -255
-    return valeur_brute + get_latest_offset()
-
-
-def save_calibration(reference_temp):
-    sensor_reading = mesure_capteur_brut()
-    if sensor_reading == -255:
-        return False
-
-    calculated_offset = reference_temp - sensor_reading
-    horodatage = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    ensure_parent_dir(CALIBRATION_PATH)
-    mode = 'a' if os.path.exists(CALIBRATION_PATH) else 'w'
-    with open(CALIBRATION_PATH, mode) as fichier:
-        if mode == 'w':
-            fichier.write("timestamp,reference_temp,sensor_reading,calculated_offset\n")
-        fichier.write(
-            f"{horodatage},{round(reference_temp, 3)},{round(sensor_reading, 3)},{round(calculated_offset, 3)}\n"
-        )
-
-    return True
-
-
 def append_measurement():
     date = datetime.now()
-    track_temperature_brut = mesure_capteur_brut()
     track_temperature = mesure_capteur()
     jour = date.strftime("%Y-%m-%d")
     heure = date.strftime("%H:%M")
-    mesure = f"{jour} / {heure} / {round(track_temperature, 2)} /  /  /  / {round(track_temperature_brut, 2)}"
+    mesure = f"{jour} / {heure} / {round(track_temperature, 2)} /  /  / "
 
     ensure_parent_dir(MESURES_PATH)
 
     mode = 'a' if os.path.exists(MESURES_PATH) else 'w'
     with open(MESURES_PATH, mode) as fichier:
         if mode == 'w':
-            fichier.write("Date / Time / Track_Temperature_1 / Humidity_% / Outside_Temperature / Atmospheric pressure hpa / Track_Temperature_1_No_Offset\n")
+            fichier.write("Date / Time / Track_Temperature_1 / Humidity_% / Outside_Temperature / Atmospheric pressure hpa\n")
         fichier.write(mesure + '\n')
 
 @app.route('/')
 def affTemp():
     heure = datetime.now().strftime("%H:%M")
-    temp_brut = mesure_capteur_brut()
-    offset = get_latest_offset()
     return render_template('index.html', 
                            temp1=round(mesure_capteur(), 2), 
-                           temp1_no_offset=round(temp_brut, 2),
-                           current_offset=round(offset, 3),
                            temp3=-255,  # Suppression des données du BME280
                            humidity=-255,  # Suppression de l'humidité
                            heure=heure, 
                            pression=-255)  # Suppression de la pression
-
-
-@app.route("/set_reference", methods=["post"])
-def set_reference():
-    reference_value = request.form.get("reference_temp", "").strip()
-    try:
-        reference_temp = float(reference_value)
-    except ValueError:
-        return redirect(request.referrer)
-
-    save_calibration(reference_temp)
-    return redirect(request.referrer)
 
 @app.route("/save_value", methods=["post"])
 def save_value():
@@ -193,8 +128,7 @@ def removedata():
 def instant_values():
     Time = datetime.now().strftime("%H:%M")
     T_Track = mesure_capteur()
-    T_Track_brut = mesure_capteur_brut()
-    values = f"{Time} / {round(T_Track, 2)} /  /  /  / {round(T_Track_brut, 2)}"
+    values = f"{Time} / {round(T_Track, 2)} /  /  / "
     return values
 
 @app.route("/Values")

@@ -4,14 +4,11 @@
 - Flask UI and API run on port 9001.
 - Raw data server runs on port 9000 and serves Mesures_temperatures/mesure.txt.
 
-## Temperature calibration model
-- Use Offset A: active offset = latest manual calibration event.
-- Calibration history file: Mesures_temperatures/calibration_history.csv.
-- CSV columns: timestamp,reference_temp,sensor_reading,calculated_offset.
+## Temperature model
+- Use raw sensor value (no calibration offset applied).
 
 ## Data contract
-- Keep Track_Temperature_1 as the offseted value for downstream readers (HHDM).
-- Keep raw value in extra column Track_Temperature_1_No_Offset.
+- Keep Track_Temperature_1 as the raw value for downstream readers (HHDM).
 
 ## Sensor and hardware assumptions
 - ADS1115 should use AnalogIn(ads, 0) for channel A0.
