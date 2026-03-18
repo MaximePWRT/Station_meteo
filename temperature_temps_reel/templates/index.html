@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://w-racingteam.com/bwx/img/favicon-32x32.png" sizes="32x32" />
+    <title>WRT | Track Temperature</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .logo { margin-bottom: 12px; }
+        .logo img { width: 280px; }
+        .datetime {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        .track-card {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 14px;
+            padding: 30px 60px;
+            text-align: center;
+            margin-bottom: 20px;
+            min-width: 320px;
+        }
+        .track-card.small {
+            padding: 20px 40px;
+        }
+        .track-card .label {
+            font-size: 0.9em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .track-card .value {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .track-card.small .value {
+            font-size: 2.2em;
+        }
+        .offset-note {
+            margin-top: 8px;
+            color: #bdbdbd;
+            font-size: 0.95em;
+        }
+        .calibration-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .calibration-form input[type="number"] {
+            background: #101010;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px 12px;
+            width: 220px;
+            font-size: 0.95em;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-size: 0.9em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .btn:hover { background: #3a3a3a; border-color: #666; }
+        .btn:active { transform: translateY(2px); background: #444; }
+        .btn-danger { border-color: #663333; }
+        .btn-danger:hover { background: #442222; border-color: #884444; }
+        .btn-warn { border-color: #665533; }
+        .btn-warn:hover { background: #443322; border-color: #886644; }
+    </style>
+</head>
+<body>
+
+    <div class="logo">
+        <img src="{{ url_for('static', filename='Logo_WRT_White-on-Black.jpg') }}" alt="WRT">
+    </div>
+
+    <div class="datetime" id="clock">--/--/---- --:--</div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2,'0');
+            const m = String(now.getMonth()+1).padStart(2,'0');
+            const y = now.getFullYear();
+            const h = String(now.getHours()).padStart(2,'0');
+            const min = String(now.getMinutes()).padStart(2,'0');
+            const s = String(now.getSeconds()).padStart(2,'0');
+            document.getElementById('clock').textContent = d+'/'+m+'/'+y+'  '+h+':'+min+':'+s;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+
+    <div class="track-card">
+        <div class="label">Track Temperature (With Offset)</div>
+        <div class="value">{{ temp1 }} °C</div>
+        <div class="offset-note">Current offset: {{ current_offset }} °C</div>
+    </div>
+
+    <div class="track-card small">
+        <div class="label">Track Temperature (No Offset)</div>
+        <div class="value">{{ temp1_no_offset }} °C</div>
+    </div>
+
+    <form action="set_reference" method="POST" class="calibration-form">
+        <input type="number" name="reference_temp" step="0.01" placeholder="Reference temp (thermometer)" required>
+        <input type="submit" value="Save Calibration" class="btn">
+    </form>
+
+    <div class="offset-note">
+        Enter thermometer temperature to recalculate offset from the latest reference point.
+    </div>
+
+    <div class="btn-row">
+        <a href="http://192.168.48.122:9000" target="_blank" rel="noopener noreferrer" class="btn btn-link">View Raw Data</a>
+        <form action="save_value" method="POST"><input type="submit" name="save_value" value="Save Values" class="btn"></form>
+        <form action="removedata_bouton" method="POST"><input type="submit" name="removedata_bouton" value="Remove Data" class="btn btn-warn"></form>
+        <form action="reboot_bouton" method="POST"><input type="submit" name="reboot_bouton" value="Reboot" class="btn btn-danger"></form>
+        <form action="shutdown_bouton" method="POST"><input type="submit" name="shutdown_bouton" value="Shutdown" class="btn btn-danger"></form>
+    </div>
+
+</body>
+</html>

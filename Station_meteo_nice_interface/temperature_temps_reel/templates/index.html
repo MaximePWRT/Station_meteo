@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://w-racingteam.com/bwx/img/favicon-32x32.png" sizes="32x32" />
+    <title>WRT | Temperature Instantanée</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo { margin-bottom: 10px; }
+        .logo img { width: 280px; }
+        .time {
+            font-size: 2em;
+            margin-bottom: 12px;
+            text-align: center;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 40px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 16px;
+        }
+        .data-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+        .data-card .label {
+            font-size: 0.85em;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .data-card .value {
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+        .telemetry-link {
+            margin-bottom: 14px;
+        }
+        .telemetry-link a {
+            color: #00ccff;
+            font-size: 0.95em;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .telemetry-link a:hover { border-bottom-color: #00ccff; }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-size: 0.9em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .btn:hover { background: #3a3a3a; border-color: #666; }
+        .btn:active { transform: translateY(2px); background: #444; }
+        .btn-danger { border-color: #663333; }
+        .btn-danger:hover { background: #442222; border-color: #884444; }
+        .btn-warn { border-color: #665533; }
+        .btn-warn:hover { background: #443322; border-color: #886644; }
+    </style>
+</head>
+<body>
+
+    <div class="logo">
+        <img src="{{ url_for('static', filename='Logo_WRT_White-on-Black.jpg') }}" alt="WRT">
+    </div>
+
+    <div class="time">
+        {{ date }}
+    </div>
+
+    <div class="data-grid">
+        <div class="data-card">
+            <div class="label">Track Temperature</div>
+            <div class="value">{{ temp1 }} °C</div>
+        </div>
+        <div class="data-card">
+            <div class="label">Outside Temperature</div>
+            <div class="value">{{ temp3 }} °C</div>
+        </div>
+        <div class="data-card">
+            <div class="label">Atmospheric Pressure</div>
+            <div class="value">{{ pression }} hPa</div>
+        </div>
+        <div class="data-card">
+            <div class="label">Humidity</div>
+            <div class="value">{{ humidity }} %</div>
+        </div>
+    </div>
+
+    <div class="telemetry-link">
+        <a href="http://10.10.0.208:9000/" target="_blank">View Weather Datas</a>
+    </div>
+
+    <div class="btn-row">
+        <form action="save_value" method="POST"><input type="submit" name="save_value" value="Save Values" class="btn"></form>
+        <form action="removedata_bouton" method="POST"><input type="submit" name="removedata_bouton" value="Remove Data" class="btn btn-warn"></form>
+        <form action="reboot_bouton" method="POST"><input type="submit" name="reboot_bouton" value="Reboot" class="btn btn-danger"></form>
+        <form action="shutdown_bouton" method="POST"><input type="submit" name="shutdown_bouton" value="Shutdown" class="btn btn-danger"></form>
+    </div>
+
+</body>
+</html>
+
+
+
