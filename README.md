@@ -18,7 +18,15 @@ https://github.com/MaximePWRT/Station_meteo.git
 From another machine on the same network:
 
 ```bash
-ssh pi@192.168.47.29
+ssh pi@<raspberry-pi-ip>
+```
+
+Replace `<raspberry-pi-ip>` with the current IP of the Raspberry Pi.
+
+If your Raspberry Pi hostname is known on the network, you can also use:
+
+```bash
+ssh pi@tracktemp-pi.local
 ```
 
 ### 2. Clone the project on a fresh Raspberry Pi
@@ -59,17 +67,26 @@ After installation, the services start automatically and also restart automatica
 
 ## Access The Station
 
-Current Raspberry Pi address:
+Use the current Raspberry Pi IP address:
 
-- `http://192.168.47.29:9001`
-- `http://192.168.47.29:9000`
+- `http://<raspberry-pi-ip>:9001`
+- `http://<raspberry-pi-ip>:9000`
 
-On another Raspberry Pi, replace `192.168.47.29` with that Pi's IP address.
+If hostname resolution is available on your network, you can also try:
+
+- `http://tracktemp-pi.local:9001`
+- `http://tracktemp-pi.local:9000`
 
 To find the Raspberry Pi IP directly on the Pi:
 
 ```bash
 hostname -I
+```
+
+To check the Raspberry Pi hostname directly on the Pi:
+
+```bash
+hostname
 ```
 
 ## Installed Services
