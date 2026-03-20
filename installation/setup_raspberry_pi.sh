@@ -29,6 +29,7 @@ install_packages() {
         python3 \
         python3-pip \
         python3-venv \
+    python3-lgpio \
         nodejs \
         npm \
         i2c-tools \
@@ -48,8 +49,12 @@ enable_i2c() {
 }
 
 create_venv() {
+    if [[ -f "$VENV_DIR/pyvenv.cfg" ]] && grep -q '^include-system-site-packages = false$' "$VENV_DIR/pyvenv.cfg"; then
+        rm -rf "$VENV_DIR"
+    fi
+
     if [[ ! -d "$VENV_DIR" ]]; then
-        python3 -m venv "$VENV_DIR"
+        python3 -m venv --system-site-packages "$VENV_DIR"
     fi
 
     "$PIP_BIN" install --upgrade pip
