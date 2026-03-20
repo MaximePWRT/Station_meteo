@@ -1,9 +1,6 @@
-@reboot cd /home/pi/Station_meteo/programme; sudo python3 app.py
-*/10 * * * * sudo python3 /home/pi/Station_meteo/programme/app.py
-
-@reboot cd /home/pi/Station_meteo/temperature_temps_reel; sudo python3 temp-temps-reel.py
-
-@reboot cd /home/pi/Station_meteo/programme; python3 app.py
-*/10 * * * * python3 /home/pi/Station_meteo/programme/app.py
-
-@reboot cd /home/pi/Station_meteo/temperature_temps_reel; python3 temp-temps-reel.py
+Managed by installation/setup_raspberry_pi.sh.
+The project now uses systemd services and a timer instead of cron:
+- station-meteo-ui.service
+- station-meteo-raw.service
+- station-meteo-writer.service
+- station-meteo-writer.timer

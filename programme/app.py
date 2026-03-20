@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from datetime import datetime
 import os
-import subprocess
 import board
 import busio
 import adafruit_ads1x15.ads1115 as ADS
@@ -17,7 +16,6 @@ except Exception as e:
 
 # Chemins des fichiers
 MESURES_PATH = '/home/pi/Station_meteo/Mesures_temperatures/mesure.txt'
-SERVEUR_SCRIPT = '/home/pi/Station_meteo/serveur/serveur.js'
 
 def lire_fichier(chemin):
     try:
@@ -47,7 +45,6 @@ def temp_cpu():
     return lire_fichier("/sys/class/thermal/thermal_zone0/temp")[:2]
 
 # Programme principal
-subprocess.run(["sudo", "pkill", "-x", "node"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 date = datetime.now()
 track_temperature = mesure_track_temp()
 jour = date.strftime("%Y-%m-%d")
@@ -62,4 +59,3 @@ with open(MESURES_PATH, mode) as f:
     if mode == 'w':
         f.write("Date / Time / Track_Temperature_1 / Humidity_% / Outside_Temperature / Atmospheric pressure hpa\n")
     f.write(mesure + '\n')
-subprocess.run(["node", SERVEUR_SCRIPT], check=False)
